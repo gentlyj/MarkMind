@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ifading.markmind.MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/parentLayout">
+
+
+        <EditText
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="22dp"
+            android:text="TextView"
+            />
+
+        <Button
+            android:layout_below="@+id/textView"
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
+        <TextView
+            android:background="#33ff0000"
+            android:layout_below="@+id/button"
+            android:id="@+id/markdown_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp" />
+
+        <LinearLayout
+            android:id="@+id/markDown_layout"
+            android:layout_width="363dp"
+            android:layout_height="40dp"
+
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"></LinearLayout>
+
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
