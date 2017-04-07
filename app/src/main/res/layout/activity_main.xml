@@ -38,12 +38,42 @@
 
         <LinearLayout
             android:id="@+id/markDown_layout"
-            android:layout_width="363dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
-
             android:background="@color/colorPrimary"
             android:orientation="horizontal"
-            android:layout_alignParentBottom="true"></LinearLayout>
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:text="@string/edit_page_short_cut_title"
+                android:id="@+id/edit_page_short_cut_title"
+                style="@style/edit_page_short_cut_tv_style" />
+
+            <TextView
+                android:text="@string/edit_page_short_cut_center"
+                android:id="@+id/edit_page_short_cut_center"
+                style="@style/edit_page_short_cut_tv_style" />
+
+            <TextView
+                android:text="@string/edit_page_short_cut_list"
+                android:id="@+id/edit_page_short_cut_list"
+                style="@style/edit_page_short_cut_tv_style" />
+
+            <TextView
+                android:text="@string/edit_page_short_cut_bold"
+                android:id="@+id/edit_page_short_cut_bold"
+                style="@style/edit_page_short_cut_tv_style" />
+
+            <TextView
+
+                android:text="@string/edit_page_short_cut_quote"
+                android:id="@+id/edit_page_short_cut_quote"
+                style="@style/edit_page_short_cut_tv_style" />
+
+
+
+
+        </LinearLayout>
 
 
 
