@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Layout;
 import android.text.Selection;
 import android.util.Log;
@@ -21,6 +23,7 @@ import com.zzhoujay.markdown.MarkDown;
 import com.zzhoujay.richtext.RichText;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     //软件键盘是否显示
     private boolean mSoftKeyboardDisplay;
 
+    @BindView(R.id.main_toolbar)
+    protected Toolbar mMainToolbar;
+
 
     @BindView(R.id.edit_page_short_cut_title)
     protected TextView mShortCutTitle;
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     protected TextView mShortCutBold;
     @BindView(R.id.edit_page_short_cut_quote)
     protected TextView mShortCutQuote;
+    //是否在编辑状态
+    private boolean mEditState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         registerKeyBoardSizeChange();
+
+        setSupportActionBar(mMainToolbar);
     }
 
     private void registerKeyBoardSizeChange() {
@@ -141,6 +151,14 @@ public class MainActivity extends AppCompatActivity {
             , R.id.edit_page_short_cut_title})
     protected void onClick(View v) {
         if (v == mButton) {
+            if (mEditState){
+                mMDTv.setVisibility(View.VISIBLE);
+                mEd.setVisibility(View.INVISIBLE);
+            }else{
+                mMDTv.setVisibility(View.INVISIBLE);
+                mEd.setVisibility(View.VISIBLE);
+            }
+            mEditState = !mEditState;
             showToast("点击按钮了");
             // 设置为Markdown
             RichText.fromMarkdown(mEd.getEditableText().toString()).into(mMDTv);
@@ -150,35 +168,6 @@ public class MainActivity extends AppCompatActivity {
         } else if (v == mShortCutTitle) {
             //showToast("点击Title了");
             clickShotrCut(SHORTCUT_TITLE);
-            /*int currentCursorLine = getCurrentCursorLine(mEd);
-            String multiLines = mEd.getText().toString();
-            String[] streets;
-            String delimiter = "\n";
-
-            streets = multiLines.split(delimiter);
-            String currentLine = streets[currentCursorLine];
-            showToast(currentLine);
-
-            int startPos = mEd.getLayout().getLineStart(currentCursorLine);
-            int endPos = mEd.getLayout().getLineEnd(currentCursorLine);
-            Log.d(TAG, "当前行,startPos:" + startPos + " endPos:" + endPos + " currentLine:" + currentLine);
-
-            String substringFirst = mEd.getText().toString().substring(0, startPos);
-            String substringEnd = mEd.getText().toString().substring(endPos);
-
-            Log.d(TAG, "当前行,substringFirst:" + substringFirst + " substringEnd:" + substringEnd);
-            String add;
-            if (currentLine.startsWith("#")) {
-                add = "#" + currentLine;
-            } else {
-                add = "# " + currentLine;
-            }
-            StringBuilder sb = new StringBuilder();
-            sb.append(substringFirst).append(add).append(substringEnd);
-
-            mEd.setText(sb.toString());*/
-
-
         } else if (v == mShortCutList) {
             showToast("点击List了");
             clickShotrCut(SHORTCUT_LIST);
@@ -193,15 +182,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void clickShotrCut(byte type) {
-
+        boolean hasAddLinereaks= false;
+        Log.d(TAG, "点击处理前et内容为:" + Arrays.toString(mEd.getText().toString().getBytes()));
         int currentCursorLine = getCurrentCursorLine(mEd);
         String multiLines = mEd.getText().toString();
         String[] streets;
         String delimiter = "\n";
 
         streets = multiLines.split(delimiter);
-        String currentLine = streets[currentCursorLine];
-        Log.d(TAG, "当前行, currentLine:" + currentLine);
+        //int lineCount = mEd.getLineCount();
+        //Log.d(TAG, "当前行号:" + currentCursorLine + " 总行号:" + lineCount);
+        String currentLine= streets[currentCursorLine];
+        if (currentCursorLine!=(mEd.getLineCount()-1)) {
+            currentLine = streets[currentCursorLine] + "\n";
+            hasAddLinereaks = true;
+        }
+
+        Log.d(TAG, "当前行, currentLine:" + currentLine + " -" + Arrays.toString(currentLine.getBytes()));
         int startPos = mEd.getLayout().getLineStart(currentCursorLine);
         int endPos = mEd.getLayout().getLineEnd(currentCursorLine);
         String substringFirst = mEd.getText().toString().substring(0, startPos);
@@ -210,32 +207,44 @@ public class MainActivity extends AppCompatActivity {
         switch (type) {
             case SHORTCUT_TITLE:
 
-                if (currentLine.startsWith("# ")||currentLine.startsWith("## ")) {
+                if (currentLine.startsWith("# ") || currentLine.startsWith("## ")) {
                     add = "#" + currentLine;
-                } else if (currentLine.startsWith("### ")){
-                    add = currentLine.replace("###","#");
-                }else {
+                } else if (currentLine.startsWith("### ")) {
+                    add = currentLine.replace("###", "#");
+                } else {
                     add = "# " + currentLine;
                 }
                 break;
 
             case SHORTCUT_CENTER:
-                add = "[" + currentLine + "]";
+                if (hasAddLinereaks){
+                    add = "[" + currentLine.replace("\n","") + "]"+"\n";
+                }else{
+                    add = "[" + currentLine + "]";
+                }
+
                 break;
 
             case SHORTCUT_LIST:
-                if (currentLine.startsWith("-")){
+                if (currentLine.startsWith("-")) {
                     break;
                 }
                 add = "- " + currentLine;
                 break;
 
             case SHORTCUT_BOLD:
-
-                break;
+                /*if (hasAddLinereaks){
+                    add = currentLine.replace("\n","") + "**"+"\n";
+                }else{
+                    add = currentLine + "]";
+                }*/
+                int index = mEd.getSelectionStart();
+                Editable editable = mEd.getText();
+                editable.insert(index, "**");
+                return;
 
             case SHORTCUT_QUOTE:
-                if (currentLine.startsWith(">")){
+                if (currentLine.startsWith(">")) {
                     break;
                 }
                 add = "> " + currentLine;
@@ -245,13 +254,12 @@ public class MainActivity extends AppCompatActivity {
                 add = currentLine;
                 break;
         }
-
+        Log.d(TAG, "处理后的当前行:" + Arrays.toString(add.getBytes()));
         StringBuilder sb = new StringBuilder();
         sb.append(substringFirst).append(add).append(substringEnd);
-
+        Log.d(TAG, "处理完成的sb:" + Arrays.toString(sb.toString().getBytes()));
         mEd.setText(sb.toString());
-        // TODO: 17/4/7 有bug,会吃掉换行
-        mEd.setSelection(startPos+add.length());
+        mEd.setSelection(startPos + (hasAddLinereaks?add.length()-1:add.length()));
     }
 
     public int getCurrentCursorLine(EditText editText) {

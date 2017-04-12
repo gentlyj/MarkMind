@@ -5,4 +5,5 @@
     <string name="edit_page_short_cut_list">-列表</string>
     <string name="edit_page_short_cut_bold">**粗体**</string>
     <string name="edit_page_short_cut_quote"><![CDATA[>引用]]></string>
+    <string name="switch_to_md">转换</string>
 </resources>
