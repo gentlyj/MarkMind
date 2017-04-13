@@ -11,6 +11,7 @@ import android.text.Selection;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -56,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.edit_page_short_cut_title)
     protected TextView mShortCutTitle;
-    @BindView(R.id.edit_page_short_cut_center)
-    protected TextView mShortCutCenter;
+    /*@BindView(R.id.edit_page_short_cut_center)
+    protected TextView mShortCutCenter;*/
     @BindView(R.id.edit_page_short_cut_list)
     protected TextView mShortCutList;
     @BindView(R.id.edit_page_short_cut_bold)
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.edit_page_short_cut_quote)
     protected TextView mShortCutQuote;
     //是否在编辑状态
-    private boolean mEditState;
+    private boolean mEditState = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,28 +139,40 @@ public class MainActivity extends AppCompatActivity {
      * 键盘显示了
      */
     private void onSoftKeyboardDisplay(int keyboardHeight) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mMarkDownLayout.getLayoutParams();
-        layoutParams.setMargins(0, 0, 0, keyboardHeight);
-        mMarkDownLayout.setLayoutParams(layoutParams);
+        // TODO: 17/4/12 这里的高度有问题 ,当edittext输入很多行,会改变高度的感觉,复杂,而且toolbar也被顶上去了,不能点击,坑啊~
+        //RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mMarkDownLayout.getLayoutParams();
+        //layoutParams.setMargins(0, 0, 0, keyboardHeight);
+        //mMarkDownLayout.setLayoutParams(layoutParams);
         mMarkDownLayout.setVisibility(View.VISIBLE);
     }
 
+    /*, R.id.edit_page_short_cut_center*/
     @OnClick({R.id.button, R.id.edit_page_short_cut_bold
-            , R.id.edit_page_short_cut_center
             , R.id.edit_page_short_cut_quote
             , R.id.edit_page_short_cut_list
             , R.id.edit_page_short_cut_title})
     protected void onClick(View v) {
         if (v == mButton) {
-            if (mEditState){
+            int length = mEd.getText().length();
+            if (length==0){
+                showToast("请输入内容");
+                return;
+            }
+            if (mEditState) {
+                mButton.setText("编辑");
                 mMDTv.setVisibility(View.VISIBLE);
                 mEd.setVisibility(View.INVISIBLE);
-            }else{
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                if (inputMethodManager.isActive()) {
+                    inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+                }
+            } else {
+                mButton.setText("转换");
                 mMDTv.setVisibility(View.INVISIBLE);
                 mEd.setVisibility(View.VISIBLE);
             }
             mEditState = !mEditState;
-            showToast("点击按钮了");
+            //showToast("点击按钮了");
             // 设置为Markdown
             RichText.fromMarkdown(mEd.getEditableText().toString()).into(mMDTv);
         } else if (v == mShortCutBold) {
@@ -171,10 +184,10 @@ public class MainActivity extends AppCompatActivity {
         } else if (v == mShortCutList) {
             showToast("点击List了");
             clickShotrCut(SHORTCUT_LIST);
-        } else if (v == mShortCutCenter) {
+        } /*else if (v == mShortCutCenter) {
             showToast("点击Center了");
             clickShotrCut(SHORTCUT_CENTER);
-        } else if (v == mShortCutQuote) {
+        } */else if (v == mShortCutQuote) {
             showToast("点击Quote了");
             clickShotrCut(SHORTCUT_QUOTE);
         }
@@ -182,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void clickShotrCut(byte type) {
-        boolean hasAddLinereaks= false;
+        boolean hasAddLinereaks = false;
         Log.d(TAG, "点击处理前et内容为:" + Arrays.toString(mEd.getText().toString().getBytes()));
         int currentCursorLine = getCurrentCursorLine(mEd);
         String multiLines = mEd.getText().toString();
@@ -192,8 +205,14 @@ public class MainActivity extends AppCompatActivity {
         streets = multiLines.split(delimiter);
         //int lineCount = mEd.getLineCount();
         //Log.d(TAG, "当前行号:" + currentCursorLine + " 总行号:" + lineCount);
-        String currentLine= streets[currentCursorLine];
-        if (currentCursorLine!=(mEd.getLineCount()-1)) {
+        String currentLine;
+        if (currentCursorLine==streets.length){
+            currentLine ="";
+        }else{
+            currentLine = streets[currentCursorLine];
+        }
+
+        if (currentCursorLine != (mEd.getLineCount() - 1)) {
             currentLine = streets[currentCursorLine] + "\n";
             hasAddLinereaks = true;
         }
@@ -217,10 +236,10 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case SHORTCUT_CENTER:
-                if (hasAddLinereaks){
-                    add = "[" + currentLine.replace("\n","") + "]"+"\n";
-                }else{
-                    add = "[" + currentLine + "]";
+                if (hasAddLinereaks) {
+                    add = "<center>" + currentLine.replace("\n", "") + "<center>" + "\n";
+                } else {
+                    add = "<center>" + currentLine + "<center>";
                 }
 
                 break;
@@ -259,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         sb.append(substringFirst).append(add).append(substringEnd);
         Log.d(TAG, "处理完成的sb:" + Arrays.toString(sb.toString().getBytes()));
         mEd.setText(sb.toString());
-        mEd.setSelection(startPos + (hasAddLinereaks?add.length()-1:add.length()));
+        mEd.setSelection(startPos + (hasAddLinereaks ? add.length() - 1 : add.length()));
     }
 
     public int getCurrentCursorLine(EditText editText) {

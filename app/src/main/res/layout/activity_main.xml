@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="com.ifading.markmind.MainActivity">
 
 
@@ -57,10 +58,10 @@
                 android:id="@+id/edit_page_short_cut_title"
                 style="@style/edit_page_short_cut_tv_style" />
 
-            <TextView
+            <!--<TextView
                 android:text="@string/edit_page_short_cut_center"
                 android:id="@+id/edit_page_short_cut_center"
-                style="@style/edit_page_short_cut_tv_style" />
+                style="@style/edit_page_short_cut_tv_style" />-->
 
             <TextView
                 android:text="@string/edit_page_short_cut_list"
@@ -82,6 +83,7 @@
     </RelativeLayout>
     <TextView
         android:layout_below="@+id/main_toolbar"
+        android:layout_margin="15dp"
         android:visibility="invisible"
         android:id="@+id/markdown_tv"
         android:layout_width="match_parent"
