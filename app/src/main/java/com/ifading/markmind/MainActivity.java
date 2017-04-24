@@ -10,6 +10,7 @@ import android.text.Layout;
 import android.text.Selection;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -144,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
         //layoutParams.setMargins(0, 0, 0, keyboardHeight);
         //mMarkDownLayout.setLayoutParams(layoutParams);
         mMarkDownLayout.setVisibility(View.VISIBLE);
+        //mMarkDownLayout.getBottom();
+
+        mEd.setBottom(mMarkDownLayout.getBottom());
+
+        /*if (mIsTitleAndBottomBarHiden) {
+            layoutParams.setMargins(0, 0, 0, 0);*/
+
     }
 
     /*, R.id.edit_page_short_cut_center*/
